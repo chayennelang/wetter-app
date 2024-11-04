@@ -1,0 +1,80 @@
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wetterabfrage</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 600px;
+            margin: auto;
+        }
+        #weather-output {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            display: none;
+        }
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1 class="text-center">Wetterabfrage</h1>
+    <div class="form-group">
+        <label for="city-input">Stadt eingeben</label>
+        <input type="text" id="city-input" placeholder="Stadt eingeben">
+    </div>
+    <button onclick="fetchWeather()">Wetter abrufen</button>
+    <div id="weather-output"></div>
+
+    <script>
+        function fetchWeather() {
+            const city = document.getElementById('city-input').value.trim();
+            if (!city) {
+                alert("Bitte geben Sie eine Stadt ein.");
+                return;
+            }
+
+            const apiKey = 'Ihr_API_Schlüssel'; // API-Schlüssel hier einfügen
+            const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric&lang=de`;
+
+            fetch(apiUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Stadt nicht gefunden oder Netzwerkfehler');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    displayWeather(data);
+                })
+                .catch(error => {
+                    displayError(error.message);
+                });
+        }
+
+        function displayWeather(data) {
+            const weatherOutput = document.getElementById('weather-output');
+            weatherOutput.innerHTML = `
+                <h2>Wetter in ${data.name}</h2>
+                <p>Temperatur: ${data.main.temp} °C</p>
+                <p>Beschreibung: ${data.weather[0].description}</p>
+            `;
+            weatherOutput.style.display = 'block';
+            weatherOutput.classList.remove('error'); // Fehlerklasse entfernen
+        }
+
+        function displayError(message) {
+            const weatherOutput = document.getElementById('weather-output');
+            weatherOutput.innerHTML = `<p class="error">${message}</p>`;
+            weatherOutput.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
